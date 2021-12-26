@@ -165,3 +165,32 @@ export async function getTopThanksReceiver(): Promise<string[]> {
     return [];
   }
 }
+
+export async function getTopUser(): Promise<number[]> {
+  try {
+    const res = await pool.query(`WITH t1 AS (
+                                    (SELECT count(*) AS likes, receiver_id
+                                    FROM thanks.message
+                                    WHERE created_at > now() - INTERVAL '10 DAY'
+                                    GROUP BY receiver_id
+                                    ORDER BY likes
+                                    LIMIT 10)
+                                    UNION
+                                    (SELECT count(*) AS likes, sender_id
+                                    FROM thanks.message
+                                    WHERE created_at > now() - INTERVAL '10 DAY'
+                                    GROUP BY sender_id
+                                    ORDER BY likes
+                                    LIMIT 10
+                                    ))
+                                SELECT u.chat_id
+                                FROM t1
+                                        JOIN thanks."user" u ON u.id = t1.receiver_id
+                                ORDER BY t1.likes DESC
+                                LIMIT 10;`);
+    return res.rows.map(({ chat_id }) => chat_id);
+  } catch (err) {
+    console.log(err);
+    return [];
+  }
+}

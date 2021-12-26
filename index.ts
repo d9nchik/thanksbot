@@ -1,6 +1,7 @@
 import { config } from 'dotenv';
-import { Context, Telegraf } from 'telegraf';
+import { Telegraf } from 'telegraf';
 import {
+  getTopUser,
   getUserID,
   getUserIDByTag,
   storeSendLike,
@@ -10,6 +11,16 @@ import {
   getTopThanksReceiver,
 } from './src/db';
 config();
+
+let topUser: number[] = [];
+(async () => {
+  topUser = await getTopUser();
+})();
+
+setInterval(async () => {
+  topUser = await getTopUser();
+  console.log(topUser);
+}, 1000 * 60 * 60 * 24 * 7);
 
 const bot = new Telegraf(process.env.BOT_TOKEN || '');
 bot.help(ctx => ctx.reply('Send me a sticker'));
