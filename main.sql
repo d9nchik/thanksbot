@@ -26,10 +26,11 @@ CREATE TABLE thanks.role
 CREATE TABLE thanks.message
 (
     id          SERIAL PRIMARY KEY,
-    sender_id   int,
-    receiver_id int,
+    sender_id   int       NOT NULL,
+    receiver_id int       NOT NULL,
     content     varchar(3268),
-    created_at  timestamp DEFAULT NOW()
+    created_at  timestamp NOT NULL DEFAULT NOW(),
+    is_sent     bool      NOT NULL DEFAULT true
 );
 
 ALTER TABLE thanks.user_role

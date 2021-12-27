@@ -9,6 +9,7 @@ import {
   getSendCount,
   getTopThanksGiver,
   getTopThanksReceiver,
+  addPersonalMessage,
 } from './src/db';
 config();
 
@@ -69,6 +70,30 @@ bot.command('sendCount', async ctx => {
   const chat = ctx.chat;
   if (chat.type === 'private' && chat.last_name && chat.username) {
     return ctx.reply(`Your send likes: ${await getSendCount(chat.id)}`);
+  }
+  return ctx.reply('You can send like only in chat with me');
+});
+
+bot.command('sendMessage', async ctx => {
+  const chat = ctx.chat;
+  if (chat.type === 'private' && chat.last_name && chat.username) {
+    const userID = await getUserID(
+      chat.id,
+      chat.first_name,
+      chat.last_name,
+      chat.username
+    );
+    if (topUser.includes(chat.id)) {
+      const messageParts = ctx.message.text.split(' ');
+      const receiver = await getUserIDByTag(messageParts[1]);
+      if (receiver) {
+        const message = messageParts.slice(2).join(' ');
+        addPersonalMessage(userID, receiver.id, message);
+        return ctx.reply('Your message will be proceeded by administrator');
+      }
+      return ctx.reply('User not exists');
+    }
+    return ctx.reply('Only top user can send personal message');
   }
   return ctx.reply('You can send like only in chat with me');
 });

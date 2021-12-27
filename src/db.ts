@@ -194,3 +194,26 @@ export async function getTopUser(): Promise<number[]> {
     return [];
   }
 }
+
+export async function addPersonalMessage(
+  sender: number,
+  receiver: number,
+  message: string
+) {
+  try {
+    await pool.query(
+      'INSERT INTO thanks.message (sender_id, receiver_id, content, is_sent) VALUES ($1, $2, $3, false)',
+      [sender, receiver, message]
+    );
+    await pool.query(
+      'UPDATE thanks."user" SET likes=((SELECT likes FROM thanks."user" WHERE id=$1)+1) WHERE id=$1',
+      [receiver]
+    );
+    await pool.query(
+      'UPDATE thanks."user" SET likes_given=((SELECT likes_given FROM thanks."user" WHERE id=$1)+1) WHERE id=$1',
+      [sender]
+    );
+  } catch (err) {
+    console.log(err);
+  }
+}
