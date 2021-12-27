@@ -56,6 +56,9 @@ bot.command('sendLike', async ctx => {
 
       const receiver = await getUserIDByTag(messageParts[1]);
       if (receiver) {
+        if (userID === receiver.id) {
+          return ctx.reply('Self liking is forbidden');
+        }
         storeSendLike(userID, receiver.id);
         ctx.telegram.sendMessage(receiver.chat_id, 'You earn like');
         return ctx.reply(`Send like ${messageParts[1]}`);
@@ -109,6 +112,9 @@ bot.command('sendMessage', async ctx => {
       const messageParts = ctx.message.text.split(' ');
       const receiver = await getUserIDByTag(messageParts[1]);
       if (receiver) {
+        if (userID === receiver.id) {
+          return ctx.reply('Self liking is forbidden');
+        }
         const message = messageParts.slice(2).join(' ');
         const messageID = await addPersonalMessage(
           userID,
