@@ -16,7 +16,8 @@ import {
   isBanned,
 } from './src/db';
 config();
-
+// nickname = tag
+// tag with or without @
 let topUser: number[] = [];
 (async () => {
   topUser = await getTopUser();
@@ -42,12 +43,12 @@ const bot = new Telegraf(process.env.BOT_TOKEN || '');
 bot.command('send_like', async ctx => {
   const messageParts = ctx.message.text.split(' ');
   const chat = ctx.chat;
-  if (chat.type === 'private' && chat.last_name && chat.username) {
+  if (chat.type === 'private' && chat.username) {
     if (messageParts.length == 2) {
       const userID = await getUserID(
         chat.id,
         chat.first_name,
-        chat.last_name,
+        chat.last_name ? chat.last_name : '',
         chat.username
       );
       if (await isBanned(userID)) {
@@ -73,15 +74,20 @@ bot.command('send_like', async ctx => {
 
 bot.command('start', async ctx => {
   const chat = ctx.chat;
-  if (chat.type === 'private' && chat.last_name && chat.username) {
-    await getUserID(chat.id, chat.first_name, chat.last_name, chat.username);
+  if (chat.type === 'private' && chat.username) {
+    await getUserID(
+      chat.id,
+      chat.first_name,
+      chat.last_name ? chat.last_name : '',
+      chat.username
+    );
   }
   return ctx.reply(`Hi👋!\n Write /sendLike to give a thanks for someone`);
 });
 
 bot.command('likes', async ctx => {
   const chat = ctx.chat;
-  if (chat.type === 'private' && chat.last_name && chat.username) {
+  if (chat.type === 'private' && chat.username) {
     return ctx.reply(`Your likes: ${await getLikesCount(chat.id)}`);
   }
   return ctx.reply('You can send like only in chat with me');
@@ -89,7 +95,7 @@ bot.command('likes', async ctx => {
 
 bot.command('send_count', async ctx => {
   const chat = ctx.chat;
-  if (chat.type === 'private' && chat.last_name && chat.username) {
+  if (chat.type === 'private' && chat.username) {
     return ctx.reply(`Your send likes: ${await getSendCount(chat.id)}`);
   }
   return ctx.reply('You can send like only in chat with me');
@@ -97,11 +103,11 @@ bot.command('send_count', async ctx => {
 
 bot.command('send_message', async ctx => {
   const chat = ctx.chat;
-  if (chat.type === 'private' && chat.last_name && chat.username) {
+  if (chat.type === 'private' && chat.username) {
     const userID = await getUserID(
       chat.id,
       chat.first_name,
-      chat.last_name,
+      chat.last_name ? chat.last_name : '',
       chat.username
     );
     if (await isBanned(userID)) {
@@ -146,7 +152,7 @@ bot.command('send_message', async ctx => {
 
 bot.command('send_user_message', async ctx => {
   const chat = ctx.chat;
-  if (chat.type === 'private' && chat.last_name && chat.username) {
+  if (chat.type === 'private' && chat.username) {
     if (adminAccounts.includes(chat.id)) {
       const messageParts = ctx.message.text.split(' ');
       if (messageParts.length == 2) {
@@ -173,7 +179,7 @@ bot.command('send_user_message', async ctx => {
 
 bot.command('ban', async ctx => {
   const chat = ctx.chat;
-  if (chat.type === 'private' && chat.last_name && chat.username) {
+  if (chat.type === 'private' && chat.username) {
     if (adminAccounts.includes(chat.id)) {
       const messageParts = ctx.message.text.split(' ');
       if (messageParts.length == 2) {
