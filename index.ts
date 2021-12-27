@@ -38,7 +38,7 @@ setInterval(async () => {
 }, 1000 * 60);
 
 const bot = new Telegraf(process.env.BOT_TOKEN || '');
-bot.help(ctx => ctx.reply('Send me a sticker'));
+
 bot.command('send_like', async ctx => {
   const messageParts = ctx.message.text.split(' ');
   const chat = ctx.chat;
@@ -199,8 +199,19 @@ bot.command('top_receiver', async ctx => {
   );
 });
 
-bot.on('sticker', ctx => ctx.reply(''));
+bot.on('sticker', ctx => ctx.reply('👋'));
 bot.hears('hi', ctx => ctx.reply('Hey there'));
+bot.help(ctx =>
+  ctx.replyWithMarkdown(`*send_like* - provide a nickname to send thanks
+*likes* - your total like count
+*send_count* - your total send like count
+*top_giver* - users that are top giver by last 7 days
+*top_receiver* - users who received a lot of likes in last 7 days
+*send_message* - user who are topGiver and topReceiver can send personal message
+*send_user_message* - approve personal message (only admin)
+*ban* - ban user (only admin)
+*help* - all of those commands`)
+);
 bot.launch();
 
 // Enable graceful stop
