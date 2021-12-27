@@ -110,6 +110,9 @@ bot.command('send_message', async ctx => {
 
     if (topUser.includes(chat.id)) {
       const messageParts = ctx.message.text.split(' ');
+      if (messageParts.length <= 2) {
+        return ctx.reply('You should provide user nickname and text');
+      }
       const receiver = await getUserIDByTag(messageParts[1]);
       if (receiver) {
         if (userID === receiver.id) {
