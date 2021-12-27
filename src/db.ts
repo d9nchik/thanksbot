@@ -231,3 +231,47 @@ export async function getAdminChatId(): Promise<number[]> {
     return [];
   }
 }
+
+interface Message {
+  message: string;
+  receiverID: number;
+  senderID: number;
+}
+
+export async function sendUserMessageByID(
+  messageID: number
+): Promise<Message | null> {
+  try {
+    const res = await pool.query(
+      'SELECT is_sent FROM thanks.message m WHERE id=$1',
+      [messageID]
+    );
+    if (!res.rows[0].is_sent) {
+      await pool.query(
+        `UPDATE thanks.message
+          SET is_sent= True
+          WHERE id = $1;`,
+        [messageID]
+      );
+      const res = await pool.query(
+        `SELECT m.content, us.chat_id AS sender_chat_id, ur.chat_id AS receiver_chat_id
+          FROM thanks.message m
+                  JOIN thanks."user" us ON us.id = m.sender_id
+                  JOIN thanks."user" ur ON ur.id = m.receiver_id
+          WHERE m.id = $1;`,
+        [messageID]
+      );
+
+      const row = res.rows[0];
+      return {
+        message: row.content,
+        receiverID: row.receiver_chat_id,
+        senderID: row.sender_chat_id,
+      };
+    }
+    return null;
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+}

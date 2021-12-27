@@ -11,6 +11,7 @@ import {
   getTopThanksReceiver,
   addPersonalMessage,
   getAdminChatId,
+  sendUserMessageByID,
 } from './src/db';
 config();
 
@@ -120,6 +121,33 @@ bot.command('sendMessage', async ctx => {
       return ctx.reply('User not exists');
     }
     return ctx.reply('Only top user can send personal message');
+  }
+  return ctx.reply('You can send like only in chat with me');
+});
+
+bot.command('sendUserMessage', async ctx => {
+  const chat = ctx.chat;
+  if (chat.type === 'private' && chat.last_name && chat.username) {
+    if (adminAccounts.includes(chat.id)) {
+      const messageParts = ctx.message.text.split(' ');
+      if (messageParts.length == 2) {
+        const message = await sendUserMessageByID(Number(messageParts[1]));
+        if (message) {
+          ctx.telegram.sendMessage(
+            message.receiverID,
+            `You get thanks: ${message.message}`
+          );
+          ctx.telegram.sendMessage(
+            message.senderID,
+            `Message Approved: "${message.message}"`
+          );
+          return ctx.reply(`Message ${messageParts[1]} approved`);
+        }
+        return ctx.reply('Message already approved');
+      }
+      return ctx.reply('Provide message id');
+    }
+    return ctx.reply('You are not admin');
   }
   return ctx.reply('You can send like only in chat with me');
 });
