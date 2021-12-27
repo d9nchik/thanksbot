@@ -13,6 +13,7 @@ import {
   getAdminChatId,
   sendUserMessageByID,
   banUser,
+  isBanned,
 } from './src/db';
 config();
 
@@ -49,6 +50,10 @@ bot.command('sendLike', async ctx => {
         chat.last_name,
         chat.username
       );
+      if (await isBanned(userID)) {
+        return ctx.reply("You're banned. You can only receive message");
+      }
+
       const receiver = await getUserIDByTag(messageParts[1]);
       if (receiver) {
         storeSendLike(userID, receiver.id);
@@ -96,6 +101,10 @@ bot.command('sendMessage', async ctx => {
       chat.last_name,
       chat.username
     );
+    if (await isBanned(userID)) {
+      return ctx.reply("You're banned. You can only receive message");
+    }
+
     if (topUser.includes(chat.id)) {
       const messageParts = ctx.message.text.split(' ');
       const receiver = await getUserIDByTag(messageParts[1]);

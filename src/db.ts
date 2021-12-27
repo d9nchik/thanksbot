@@ -286,3 +286,16 @@ export async function banUser(userID: number) {
     console.log(err);
   }
 }
+
+export async function isBanned(userID: number): Promise<boolean> {
+  try {
+    const res = await pool.query(
+      'SELECT user_id FROM thanks.user_role WHERE user_id = $1 AND role_id=2',
+      [userID]
+    );
+    return res.rows.length == 1;
+  } catch (error) {
+    console.log(error);
+    return true;
+  }
+}
