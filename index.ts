@@ -39,7 +39,7 @@ setInterval(async () => {
 
 const bot = new Telegraf(process.env.BOT_TOKEN || '');
 bot.help(ctx => ctx.reply('Send me a sticker'));
-bot.command('sendLike', async ctx => {
+bot.command('send_like', async ctx => {
   const messageParts = ctx.message.text.split(' ');
   const chat = ctx.chat;
   if (chat.type === 'private' && chat.last_name && chat.username) {
@@ -87,7 +87,7 @@ bot.command('likes', async ctx => {
   return ctx.reply('You can send like only in chat with me');
 });
 
-bot.command('sendCount', async ctx => {
+bot.command('send_count', async ctx => {
   const chat = ctx.chat;
   if (chat.type === 'private' && chat.last_name && chat.username) {
     return ctx.reply(`Your send likes: ${await getSendCount(chat.id)}`);
@@ -95,7 +95,7 @@ bot.command('sendCount', async ctx => {
   return ctx.reply('You can send like only in chat with me');
 });
 
-bot.command('sendMessage', async ctx => {
+bot.command('send_message', async ctx => {
   const chat = ctx.chat;
   if (chat.type === 'private' && chat.last_name && chat.username) {
     const userID = await getUserID(
@@ -141,7 +141,7 @@ bot.command('sendMessage', async ctx => {
   return ctx.reply('You can send like only in chat with me');
 });
 
-bot.command('sendUserMessage', async ctx => {
+bot.command('send_user_message', async ctx => {
   const chat = ctx.chat;
   if (chat.type === 'private' && chat.last_name && chat.username) {
     if (adminAccounts.includes(chat.id)) {
@@ -184,13 +184,13 @@ bot.command('ban', async ctx => {
   return ctx.reply('You can send like only in chat with me');
 });
 
-bot.command('topGiver', async ctx => {
+bot.command('top_giver', async ctx => {
   return ctx.reply(
     (await getTopThanksGiver()).map((e, i) => `${i + 1}) ${e}`).join('\n')
   );
 });
 
-bot.command('topReceiver', async ctx => {
+bot.command('top_receiver', async ctx => {
   return ctx.reply(
     (await getTopThanksReceiver()).map((e, i) => `${i + 1}) ${e}`).join('\n')
   );
