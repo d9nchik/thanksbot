@@ -12,6 +12,7 @@ import {
   addPersonalMessage,
   getAdminChatId,
   sendUserMessageByID,
+  banUser,
 } from './src/db';
 config();
 
@@ -146,6 +147,22 @@ bot.command('sendUserMessage', async ctx => {
         return ctx.reply('Message already approved');
       }
       return ctx.reply('Provide message id');
+    }
+    return ctx.reply('You are not admin');
+  }
+  return ctx.reply('You can send like only in chat with me');
+});
+
+bot.command('ban', async ctx => {
+  const chat = ctx.chat;
+  if (chat.type === 'private' && chat.last_name && chat.username) {
+    if (adminAccounts.includes(chat.id)) {
+      const messageParts = ctx.message.text.split(' ');
+      if (messageParts.length == 2) {
+        await banUser(Number(messageParts[1]));
+        return ctx.reply('User banned');
+      }
+      return ctx.reply('Provide user id');
     }
     return ctx.reply('You are not admin');
   }

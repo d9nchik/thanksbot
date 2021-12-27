@@ -275,3 +275,14 @@ export async function sendUserMessageByID(
     return null;
   }
 }
+
+export async function banUser(userID: number) {
+  try {
+    await pool.query(
+      'INSERT INTO thanks.user_role (role_id, user_id) VALUES (2, $1)',
+      [userID]
+    );
+  } catch (err) {
+    console.log(err);
+  }
+}
