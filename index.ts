@@ -10,6 +10,7 @@ import {
   getTopThanksGiver,
   getTopThanksReceiver,
   addPersonalMessage,
+  getAdminChatId,
 } from './src/db';
 config();
 
@@ -22,6 +23,16 @@ setInterval(async () => {
   topUser = await getTopUser();
   console.log(topUser);
 }, 1000 * 60 * 60 * 24 * 7);
+
+let adminAccounts: number[] = [];
+
+(async () => {
+  adminAccounts = await getAdminChatId();
+})();
+
+setInterval(async () => {
+  adminAccounts = await getAdminChatId();
+}, 1000 * 60);
 
 const bot = new Telegraf(process.env.BOT_TOKEN || '');
 bot.help(ctx => ctx.reply('Send me a sticker'));
@@ -88,7 +99,22 @@ bot.command('sendMessage', async ctx => {
       const receiver = await getUserIDByTag(messageParts[1]);
       if (receiver) {
         const message = messageParts.slice(2).join(' ');
-        addPersonalMessage(userID, receiver.id, message);
+        const messageID = await addPersonalMessage(
+          userID,
+          receiver.id,
+          message
+        );
+        if (message === null) {
+          return ctx.reply(
+            'Oops, try again to resend your message after a while'
+          );
+        }
+        adminAccounts.forEach(chat_id =>
+          ctx.telegram.sendMessage(
+            chat_id,
+            `UserID: ${userID}\nMessage ID:${messageID}\nMessage:${message}`
+          )
+        );
         return ctx.reply('Your message will be proceeded by administrator');
       }
       return ctx.reply('User not exists');

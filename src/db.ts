@@ -199,10 +199,10 @@ export async function addPersonalMessage(
   sender: number,
   receiver: number,
   message: string
-) {
+): Promise<number | null> {
   try {
-    await pool.query(
-      'INSERT INTO thanks.message (sender_id, receiver_id, content, is_sent) VALUES ($1, $2, $3, false)',
+    const res = await pool.query(
+      'INSERT INTO thanks.message (sender_id, receiver_id, content, is_sent) VALUES ($1, $2, $3, false) RETURNING id',
       [sender, receiver, message]
     );
     await pool.query(
@@ -213,7 +213,21 @@ export async function addPersonalMessage(
       'UPDATE thanks."user" SET likes_given=((SELECT likes_given FROM thanks."user" WHERE id=$1)+1) WHERE id=$1',
       [sender]
     );
+    return res.rows[0].id;
   } catch (err) {
     console.log(err);
+    return null;
+  }
+}
+
+export async function getAdminChatId(): Promise<number[]> {
+  try {
+    const res = await pool.query(`SELECT u.chat_id
+                                  FROM thanks.user u
+                                          JOIN thanks.user_role ur ON ur.user_id = u.id;`);
+    return res.rows.map(({ chat_id }) => chat_id);
+  } catch (err) {
+    console.log(err);
+    return [];
   }
 }

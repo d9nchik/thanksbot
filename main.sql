@@ -44,3 +44,8 @@ ALTER TABLE thanks.message
 
 ALTER TABLE thanks.message
     ADD FOREIGN KEY (receiver_id) REFERENCES thanks."user" (id);
+
+
+INSERT INTO thanks.role (name)
+VALUES ('admin'),
+       ('banned');
