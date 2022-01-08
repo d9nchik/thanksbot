@@ -113,6 +113,9 @@ interface ChatIdAndUserId {
 export async function getUserIDByTag(
   tag: string
 ): Promise<ChatIdAndUserId | null> {
+  if (tag.startsWith('@')) {
+    tag = tag.slice(1);
+  }
   try {
     const res = await pool.query(
       'SELECT id, chat_id  FROM thanks."user" WHERE telegram_tag=$1',

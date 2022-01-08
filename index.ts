@@ -16,7 +16,6 @@ import {
   isBanned,
 } from './src/db';
 config();
-// nickname = tag
 // tag with or without @
 let topUser: number[] = [];
 (async () => {
@@ -117,7 +116,7 @@ bot.command('send_message', async ctx => {
     if (topUser.includes(chat.id)) {
       const messageParts = ctx.message.text.split(' ');
       if (messageParts.length <= 2) {
-        return ctx.reply('You should provide user nickname and text');
+        return ctx.reply('You should provide user nickname(tag) and text');
       }
       const receiver = await getUserIDByTag(messageParts[1]);
       if (receiver) {
@@ -208,7 +207,7 @@ bot.command('top_receiver', async ctx => {
 bot.on('sticker', ctx => ctx.reply('👋'));
 bot.hears('hi', ctx => ctx.reply('Hey there'));
 bot.help(ctx =>
-  ctx.replyWithMarkdown(`*send_like* - provide a nickname to send thanks
+  ctx.replyWithMarkdown(`*send_like* - provide a nickname(tag) to send thanks
 *likes* - your total like count
 *send_count* - your total send like count
 *top_giver* - users that are top giver by last 7 days
